@@ -1,0 +1,6 @@
+framework module Pods_SpaceX_Launches_SpaceX_LaunchesUITests {
+  umbrella header "Pods-SpaceX Launches-SpaceX LaunchesUITests-umbrella.h"
+
+  export *
+  module * { export * }
+}
