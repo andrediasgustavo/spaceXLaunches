@@ -11,17 +11,18 @@ import Reusable
 import Combine
 import SnapKit
 
-final class HomeVC: BaseVC<HomeViewModel> {
+final class HomeVC: BaseVC<HomeVM> {
     
     private var subscriptions = Set<AnyCancellable>()
+    private var launches = [SpaceXLaunchModel]()
     
     private lazy var tableView: UITableView = {
         let view = UITableView(frame: .zero, style: .insetGrouped)
         view.showsVerticalScrollIndicator = false
-        view.contentInset = .init(top: 0, left: 0, bottom: 20, right: 0)
+        view.contentInset = .init(top: 0, left: 0, bottom: 0, right: 0)
         view.register(cellType: HomeCell.self)
-        view.rowHeight = 40
-        view.delegate = self
+        view.rowHeight = 200
+        view.separatorStyle = .none
         view.dataSource = self
         return view
     }()
@@ -34,22 +35,17 @@ final class HomeVC: BaseVC<HomeViewModel> {
         return view
     }()
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        
-    }
-    
     override func setupView() {
         super.setupView()
-        
+        self.title = Constants.homeTitle
+        self.view.backgroundColor = .white
         self.view.addSubview(tableView)
         self.view.addSubview(activityIndicator)
         
-        self.activityIndicator.backgroundColor = .gray
+        self.activityIndicator.color = .gray
     }
     
-    override func bind(to vm: HomeViewModel) {
+    override func bind(to vm: HomeVM) {
         super.bind(to: vm)
         
         vm.outputs.isLoading.sink { [weak self] isLoading in
@@ -59,8 +55,17 @@ final class HomeVC: BaseVC<HomeViewModel> {
             } else {
                 self.stopActivityIndicator()
             }
-            self.activityIndicator.isHidden = !isLoading
         }.store(in: &subscriptions)
+        
+        vm.outputs.feed.sink  { [weak self] feed in
+            guard let self = self else { return }
+            self.launches = feed
+            DispatchQueue.main.async {
+                self.tableView.reloadData()
+            }
+        }.store(in: &subscriptions)
+        
+        vm.loadResults()
     }
     
     
@@ -82,13 +87,20 @@ final class HomeVC: BaseVC<HomeViewModel> {
     }
     
     private func startActivityIndicator() {
-        self.activityIndicator.isHidden = false
-        self.activityIndicator.startAnimating()
+        DispatchQueue.main.async {
+            self.tableView.isHidden = true
+            self.activityIndicator.isHidden = false
+            self.activityIndicator.startAnimating()
+        }
+     
     }
     
     private func stopActivityIndicator() {
-        self.activityIndicator.stopAnimating()
-        self.activityIndicator.isHidden = true
+        DispatchQueue.main.async {
+            self.tableView.isHidden = false
+            self.activityIndicator.stopAnimating()
+            self.activityIndicator.isHidden = true
+        }
     }
     
 }
@@ -96,20 +108,13 @@ final class HomeVC: BaseVC<HomeViewModel> {
 
 extension HomeVC: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 1
+        return self.launches.count
     }
-    
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(for: indexPath, cellType: HomeCell.self)
-        cell.configureView()
+        cell.configureView(with: self.launches[indexPath.row])
         return cell
-        
     }
-    
-    
-}
-
-extension HomeVC: UITableViewDelegate {
     
 }

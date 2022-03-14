@@ -7,7 +7,6 @@ target 'SpaceX Launches' do
 
   # Pods for SpaceX Launches
 
-  pod 'Alamofire', '~> 5.5'
   pod 'Kingfisher', '~> 7.0'
   pod 'SnapKit', '~> 5.0.0'
   pod 'Reusable'

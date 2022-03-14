@@ -68,7 +68,7 @@ open class BaseVC<VM>: UIViewController {
     /// Method called in `viewDidLoad`, used to add subviews or make any UI modifications.
     open func setupView() {
         
-        navigationController?.navigationBar.prefersLargeTitles = true
+        navigationController?.navigationBar.prefersLargeTitles = false
         navigationController?.navigationBar.clipsToBounds = false
         navigationItem.backBarButtonItem = backBarBtn
         self.setupAppearence()
@@ -100,21 +100,7 @@ open class BaseVC<VM>: UIViewController {
         navigationItem.scrollEdgeAppearance = standard
         navigationItem.compactAppearance = standard// For iPhone small navigation bar in landscape.
     }
-    
-    open func setNavColor(_ color: UIColor?) {
-        let appearance = UINavigationBarAppearance()
-        appearance.configureWithOpaqueBackground()
-        appearance.backgroundColor = color
-        self.navigationController?.navigationBar.standardAppearance = appearance
-        self.navigationController?.navigationBar.scrollEdgeAppearance = self.navigationController?.navigationBar.standardAppearance
-    }
-    
-    open func setNavColorForPresentedVC(_ color: UIColor?) {
-        standard.backgroundColor = color
-        navigationItem.standardAppearance = standard
-        navigationItem.scrollEdgeAppearance = standard
-        navigationItem.compactAppearance = standard
-    }
+
     
 }
 
